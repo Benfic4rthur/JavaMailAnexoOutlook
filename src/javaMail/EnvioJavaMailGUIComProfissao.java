@@ -1,6 +1,8 @@
 package javaMail;
 
+import java.awt.Dimension;
 import java.awt.EventQueue;
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
@@ -51,12 +53,22 @@ public class EnvioJavaMailGUIComProfissao extends JFrame {
 	}
 	public EnvioJavaMailGUIComProfissao() {
 		setTitle("Envio de email");
-		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 470, 380);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setContentPane(contentPane);
 		contentPane.setLayout(null);
+		// Configura o tamanho da janela
+		setSize(470, 380);
+		// Obtém as dimensões da tela
+		Dimension tela = Toolkit.getDefaultToolkit().getScreenSize();
+		// Calcula a posição da janela no centro da tela
+		int x = (tela.width - getWidth()) / 2;
+		int y = (tela.height - getHeight()) / 2;
+		// Configura a posição da janela
+		setLocation(x, y);
+		// Configura o comportamento padrão do botão fechar da janela
+		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		
 		/*Labels*/
 
@@ -192,8 +204,8 @@ public class EnvioJavaMailGUIComProfissao extends JFrame {
 		String para = emailToField.getText();
 		String assunto = emailSubjectField.getText();
 		String mensagem = emailMessageArea.getText();
-		String username = "seu email hotmail aqui";
-		String password = "sua senha aqui";
+		String username = "seu email hotmail@hotmail.com";
+		String password = "senha do email aqui";
 		StringBuilder stringBuildermensagemEmail = new StringBuilder();
 		stringBuildermensagemEmail.append("<html><body style='background-color:#F5F5F5;'>");
 		stringBuildermensagemEmail.append("<div style='background-color:#FFFFFF;padding:20px;'>");
@@ -223,27 +235,35 @@ public class EnvioJavaMailGUIComProfissao extends JFrame {
 		}
 		
 		if (anexo == null || !anexo.exists()) {
-			int anexoemail =  JOptionPane.showConfirmDialog(null, "Deseja prossegui sem anexo?");
-		if(anexoemail == 0) {
-				EnvioJavaMail envioSemAnexo = new EnvioJavaMail(username, password, de, para, assunto, stringBuildermensagemEmail.toString());
-				boolean enviadoComSucessoSemAnexo = envioSemAnexo.enviarEmail(true);
-				if (enviadoComSucessoSemAnexo) {
-					timer.start();
-				} else {
-					JOptionPane.showMessageDialog(null, "Ocorreu um erro ao enviar o email.");
-				}
-				}else {
-				JOptionPane.showMessageDialog(null, "Por favor, preencha todos os campos.");
-				return;
-			}
-		}else if(anexo != null || anexo.exists()) {
-		EnvioJavaMail envio = new EnvioJavaMail(username, password, de, para, assunto, stringBuildermensagemEmail.toString(), anexo);
-		boolean enviadoComSucesso = envio.enviarEmailAnexo(true);
-		if (enviadoComSucesso) {
-			timer.start();
-		} else {
-			JOptionPane.showMessageDialog(null, "Ocorreu um erro ao enviar o email.");
-		}
+		    int anexoemail = JOptionPane.showConfirmDialog(null, "Deseja prosseguir o envio do e-mail sem anexo?");
+		    if (anexoemail == JOptionPane.YES_OPTION) {
+		        EnvioJavaMail envioSemAnexo = new EnvioJavaMail(username, password, de, para, assunto, stringBuildermensagemEmail.toString());
+		        try {
+		            boolean enviadoComSucessoSemAnexo = envioSemAnexo.enviarEmail(true);
+		            if (enviadoComSucessoSemAnexo) {
+		                timer.start();
+		            } else {
+		                JOptionPane.showMessageDialog(null, "Ocorreu um erro ao enviar o e-mail.");
+		            }
+		        } catch (Exception ex) {
+		            JOptionPane.showMessageDialog(null, "Ocorreu um erro ao enviar o e-mail: " + ex.getMessage());
+		        }
+		    } else {
+		        JOptionPane.showMessageDialog(null, "Por favor, preencha o anexo.");
+		        return;
+		    }
+		} else if (anexo != null && anexo.exists()) {
+		    EnvioJavaMail envio = new EnvioJavaMail(username, password, de, para, assunto, stringBuildermensagemEmail.toString(), anexo);
+		    try {
+		        boolean enviadoComSucesso = envio.enviarEmailAnexo(true);
+		        if (enviadoComSucesso) {
+		            timer.start();
+		        } else {
+		            JOptionPane.showMessageDialog(null, "Ocorreu um erro ao enviar o e-mail.");
+		        }
+		    } catch (Exception ex) {
+		        JOptionPane.showMessageDialog(null, "Ocorreu um erro ao enviar o e-mail: " + ex.getMessage());
+		    }
 		}
 	}
 }
